@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: ./app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - grafana
+      - loki
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:
+  loki-storage:
+
